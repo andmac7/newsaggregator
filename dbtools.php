@@ -73,7 +73,7 @@ function insertUser($userName, $password, $email, $dbc)
 
 	if(!$result)
 	{
-		errorMessage("Could not create user ".$userName, 400);		
+		errorMessage("Could not register user ".$userName.". Try another username.", 400);		
 	} else
 	{
 		successMessage($result);

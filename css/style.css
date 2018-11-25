@@ -139,9 +139,20 @@ div#login-prompt,div#register-prompt {
 }
 
 .msg-success {
-  color: lightgreen;
+  color: lightyellow;
 }
 
 .msg-error {
   color: lightcoral;
+}
+
+#status-msg {
+  padding-bottom: 12px;
+}
+
+.load-icon {
+  color: lightyellow;
+  font-size: 60px;
+  display: none;
+  margin-top: 30px;
 }

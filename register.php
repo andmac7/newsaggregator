@@ -19,6 +19,10 @@
         {
             insertUser($userName, $password, $email, $dbc);
         }
+        else
+        {
+            errorMessage("Could not create user.", 400);
+        }
     }
 ?>
 <head>
@@ -41,14 +45,14 @@
                     url: 'register.php',
                     type: 'POST',
                     data: {'userName': userName, 'password': password, 'email': email },
-                    success: function(data) {
+                    success: function() {
                         $("#register-prompt").fadeOut("slow", function(){
                             $("#register-prompt").after("<h2 class='msg-success'>Successfully created account!</h2>");
                             setTimeout(function(){ window.location = "login.php"; }, 2000);
                         });
                     },
                     error: function(data) {
-                        console.log(data);
+                        statusMessage('error', data.responseJSON.message);
                     }
                 });
             } else {
@@ -77,12 +81,13 @@
 <body>
 	<div class="centeredContent col-xs-1" align="center">
 		<div id="register-prompt">
+            <div id="status-msg"></div>
             <input id="register-userName" type="text" class="form-control" placeholder="Username" >
             <input id="register-password" type="password" class="form-control" placeholder="Password" >
             <input id="register-email" type="text" class="form-control" placeholder="E-mail" >
             <button id="register-btn" type="submit" class="btn btn-primary">Register Account</button>
             <a href="login.php">
-            Already have an account
+            I already have an account
             </a>
         </div>
 	</div>

@@ -41,11 +41,13 @@
 <body>
 	<button id="logout-btn" class="btn btn-link">Log out</button>
 	<div class="centeredContent col-xs-1" align="center">
+		<h3 class="msg-success">Welcome <?php echo($_SESSION['loginUser']) ?>!</h3>
+		<div class="msg-success">Add search words below.</div>
 		<div id="add-search-term">
-			<input id="termId" type="text" class="form-control" name="searchWord" id="termId">
+			<input id="termId" maxlength="100" type="text" class="form-control" name="searchWord" id="termId">
 			<button id="add-btn" type="submit" class="btn btn-primary"><i class="fas fa-plus"></i></button>
 		</div>
-
+		<div id="status-msg"></div>
 		<div id="searchTerms">
 			<?php
 				$arrlength = count($searchWords);
@@ -61,6 +63,7 @@
 				}		
 			?>
 		</div>
+		<i class="load-icon fa fa-spinner fa-pulse fa-3x fa-fw"></i>
 		<div id="articles-list">
 		</div>
 	</div>

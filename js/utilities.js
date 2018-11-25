@@ -48,7 +48,7 @@ function initIndexPage() {
                                     </div>`;
                     $("#searchTerms").append(newWord);
                     $("#termId").val('');
-                    getNewsArticles();
+                    getNewsArticles(userName);
                 }
             });
         }
@@ -62,69 +62,92 @@ function initIndexPage() {
             type: 'POST',
             data: {'userName': userName, 'wordId':id, 'action': 'deleteWord' },
             success: function(data) {
-                $("#entry-"+id).hide(200, function(){ getNewsArticles(); });
+                $("#entry-"+id).hide(200, function(){ 
+                    $(this).remove();
+                    getNewsArticles(userName); 
+                });
             },
             error: function(data) {
-                alert(data);
+                statusMessage('error', data.responseJSON.message);
             }
         });
     });
-    
-    // Fetch articles
-    function getNewsArticles() {
-        $.ajax({
-                url: 'api.php',
-                type: 'GET',
-                data: {'userName': userName, 'action': 'getArticles'},
-                success: function(data) {
-                    data = $.parseJSON(data);
-                    data = sortArray(data, "date");
-                    renderNewsArticles(data);
-                },
-                error: function(data) {
-                    alert(data);
-                }
-            });
-    }
 
-    // Sort on element
-    function sortArray(dataArray, sortWord) {
-        dataArray.sort(function(a, b) {
-            if (a[sortWord] > b[sortWord]) return -1;
-            if (b[sortWord] > a[sortWord]) return 1;
-            return 0;
-        });
-        return dataArray;
-    }
-
-    // Render articles to the DOM
-    function renderNewsArticles(articles) {
-        if (articles.length > 0) {
-            $("#articles-list").html("").hide();
-            var articlesParsed = articles;
-            $.each(articlesParsed, function(key,value){
-                var template = 
-                `<div class='article'>
-                    <a target='_blank'  href="${ value.link }">
-                        <h3>${ value.date }</h3>
-                        <h2 class='article-title'>${ value.title }</h2>
-                        <div class='article-desc'>${ value.desc }</div>
-                        <div class='article-foot'>Source: ${ value.url }<br>${ value.word }</div>
-                    </a>
-                </div>`;
-                $("#articles-list").append(template);
-            });
-            $("#articles-list").fadeIn();
-        } else {
-            $("#articles-list").fadeOut();
-        }
-    }
-
-    getNewsArticles();
+    getNewsArticles(userName);
 }
 
 // Check email formatting
 function isEmail(email) {
     var regex = /^([a-zA-Z0-9_.+-])+\@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$/;
     return regex.test(email);
+}
+
+function statusMessage(type, message) {
+    var el = $("#status-msg");
+    if (type == 'error') {
+        el.addClass("msg-error");
+    } else if (type == 'success') {
+        el.addClass("msg-success");
+    }
+    el.html(message);
+}
+
+// Sort on element
+function sortArray(dataArray, sortWord) {
+    dataArray.sort(function(a, b) {
+        if (a[sortWord] > b[sortWord]) return -1;
+        if (b[sortWord] > a[sortWord]) return 1;
+        return 0;
+    });
+    return dataArray;
+}
+
+// Render articles to the DOM
+function renderNewsArticles(articles) {
+    if (articles.length > 0) {
+        $("#articles-list").html("").hide();
+        var articlesParsed = articles;
+        $.each(articlesParsed, function(key,value){
+            var template = 
+            `<div class='article'>
+                <a target='_blank'  href="${ value.link }">
+                    <h3>${ value.date }</h3>
+                    <h2 class='article-title'>${ value.title }</h2>
+                    <div class='article-desc'>${ value.desc }</div>
+                    <div class='article-foot'>Source: ${ value.url }<br>${ value.word }</div>
+                </a>
+            </div>`;
+            $("#articles-list").append(template);
+        });
+        $("#articles-list").fadeIn();
+    } else {
+        $("#articles-list").fadeOut();
+    }
+}
+
+// Fetch articles
+function getNewsArticles(userName) {
+    // check if there are any words to prevent unnecessary searches
+    var btnCount = $(".word-btn").size();
+    if (btnCount > 0) {
+    $(".load-icon").fadeIn();
+    $.ajax({
+            url: 'api.php',
+            type: 'GET',
+            data: {'userName': userName, 'action': 'getArticles'},
+            success: function(data) {
+                data = $.parseJSON(data);
+                data = sortArray(data, "date");
+                renderNewsArticles(data);
+                $(".load-icon").hide();
+            },
+            error: function(data) {
+                statusMessage('error', data.responseJSON.message);
+                $(".load-icon").fadeOut();
+            }
+        });
+    } else {
+        $(".load-icon").hide();
+        $("#articles-list").fadeOut();
+    }
 }
